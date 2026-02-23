@@ -1,0 +1,21 @@
+2026-02-23 19:21:03,924 - ERROR - Transform step failed: No timestamped raw traffic_sites CSV found.
+Traceback (most recent call last):
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 82, in <module>
+    raw_df = load_latest_raw()
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 21, in load_latest_raw
+    raise FileNotFoundError("No timestamped raw traffic_sites CSV found.")
+FileNotFoundError: No timestamped raw traffic_sites CSV found.
+2026-02-23 19:23:08,986 - ERROR - Transform step failed: No timestamped raw traffic_sites CSV found.
+Traceback (most recent call last):
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 82, in <module>
+    raw_df = load_latest_raw()
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 21, in load_latest_raw
+    raise FileNotFoundError("No timestamped raw traffic_sites CSV found.")
+FileNotFoundError: No timestamped raw traffic_sites CSV found.
+2026-02-23 19:30:37,589 - ERROR - Transform step failed: No timestamped raw traffic_sites CSV found.
+Traceback (most recent call last):
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 82, in <module>
+    raw_df = load_latest_raw()
+  File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 21, in load_latest_raw
+    raise FileNotFoundError("No timestamped raw traffic_sites CSV found.")
+FileNotFoundError: No timestamped raw traffic_sites CSV found.
