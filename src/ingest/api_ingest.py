@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-from datetime import datetime
+from datetime import datetime, UTC
 from src.utils.logger import get_logger
 
 logger = get_logger("ingest")
@@ -16,7 +16,7 @@ def ingest_sites_csv():
 
     df = pd.read_csv(source_path)
 
-    ts = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
     dest_path = os.path.join(RAW_DIR, f"traffic_sites_{ts}.csv")
 
     df.to_csv(dest_path, index=False)
