@@ -65,7 +65,8 @@ def transform_sites(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Add metadata
-    df["ingested_at_utc"] = datetime.utcnow().isoformat()
+    df["ingested_at_utc"] = datetime.now(datetime.UTC).isoformat()
+
 
     logger.info("Transformation complete.")
     return df

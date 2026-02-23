@@ -19,3 +19,6 @@ Traceback (most recent call last):
   File "C:\Users\erica\Downloads\python-data-engineering-pipeline\src\transform\transform_sites.py", line 21, in load_latest_raw
     raise FileNotFoundError("No timestamped raw traffic_sites CSV found.")
 FileNotFoundError: No timestamped raw traffic_sites CSV found.
+2026-02-23 19:33:29,924 - INFO - Loading raw file: data/raw\traffic_sites_20260223_063307.csv
+2026-02-23 19:33:29,966 - INFO - Transformation complete.
+2026-02-23 19:33:29,974 - INFO - Saved processed file: data/processed\traffic_sites_processed_20260223_063329.csv

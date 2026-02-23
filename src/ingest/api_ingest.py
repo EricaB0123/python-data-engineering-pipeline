@@ -16,7 +16,7 @@ def ingest_sites_csv():
 
     df = pd.read_csv(source_path)
 
-    ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    ts = datetime.now(datetime.UTC).strftime("%Y%m%d_%H%M%S")
     dest_path = os.path.join(RAW_DIR, f"traffic_sites_{ts}.csv")
 
     df.to_csv(dest_path, index=False)
