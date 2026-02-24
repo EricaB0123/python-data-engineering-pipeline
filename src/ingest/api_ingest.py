@@ -1,36 +1,75 @@
-import pandas as pd
 import os
-#from datetime import datetime, UTC
+import requests
+import pandas as pd
+from src.utils.logger import get_logger
 from src.utils.settings import Config
 from src.utils.time import utc_now
 
+logger = get_logger(__name__)
+metrics = get_logger("metrics")
 
-from src.utils.logger import get_logger
 
-logger = get_logger("ingest")
+def fetch_api_data():
+    """
+    Fetches data from the configured API endpoint.
+    """
+    start_time = utc_now()
 
-RAW_DIR = "data/raw"
-os.makedirs(RAW_DIR, exist_ok=True)
+    try:
+        response = requests.get(
+            Config.API_URL,
+            headers={"Authorization": f"Bearer {Config.API_KEY}"},
+            timeout=10
+        )
+        response.raise_for_status()
 
-def ingest_sites_csv():
-    source_path = os.path.join(RAW_DIR, "traffic_sites.csv")
+        data = response.json()
+        logger.info("API request successful")
+        metrics.info(f"api_status=success")
 
-    if not os.path.exists(source_path):
-        raise FileNotFoundError(f"Source CSV not found at {source_path}")
+        return data
 
-    df = pd.read_csv(source_path)
+    except Exception as e:
+        logger.error(f"API request failed: {e}")
+        metrics.info("api_status=failure")
+        raise
+
+    finally:
+        duration = (utc_now() - start_time).total_seconds()
+        metrics.info(f"api_latency_sec={duration}")
+
+
+def save_raw_csv(data):
+    """
+    Saves API data to a timestamped CSV in the raw directory.
+    """
+    df = pd.DataFrame(data)
 
     ts = utc_now().strftime(Config.TIMESTAMP_FORMAT)
-    dest_path = os.path.join(Config.DATA_RAW_DIR, f"traffic_sites_{ts}.csv")
+    output_file = os.path.join(
+        Config.DATA_RAW_DIR,
+        f"traffic_sites_{ts}.csv"
+    )
+
+    df.to_csv(output_file, index=False)
+
+    logger.info(f"Raw data saved: {output_file}")
+    metrics.info(f"raw_rows={len(df)}")
 
 
-    df.to_csv(dest_path, index=False)
-    logger.info(f"Ingested traffic sites CSV → {dest_path}")
+def ingest():
+    """
+    Main ingestion workflow:
+    - Fetch API data
+    - Save to raw CSV
+    """
+    logger.info("Starting API ingestion")
 
-    return dest_path
+    data = fetch_api_data()
+    save_raw_csv(data)
+
+    logger.info("API ingestion completed successfully")
+
 
 if __name__ == "__main__":
-    try:
-        ingest_sites_csv()
-    except Exception as e:
-        logger.exception(f"Ingestion failed: {e}")
+    ingest()
