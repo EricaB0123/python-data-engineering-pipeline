@@ -1,92 +1,79 @@
 import os
 import pandas as pd
-#from datetime import datetime, UTC
-#from src.utils.time import utc_now
 from src.utils.logger import get_logger
-from src.utils.settings import DATA_RAW_DIR, DATA_PROCESSED_DIR, TIMESTAMP_FORMAT
+from src.utils.settings import Config
 from src.utils.time import utc_now
 
-from src.utils.paths import RAW_DIR
+logger = get_logger(__name__)
+metrics = get_logger("metrics")
 
 
-logger = get_logger("transform")
-
-#RAW_DIR = "data/raw"  #replaced with paths.py files
-#PROCESSED_DIR = "data/processed"
-os.makedirs(PROCESSED_DIR, exist_ok=True)
-
-def load_latest_raw():
-    """Load the most recent timestamped raw CSV."""
-    files = sorted(
-        [f for f in os.listdir(RAW_DIR) if f.startswith("traffic_sites_") and f.endswith(".csv")],
-        reverse=True
-    )
-
-    if not files:
-        raise FileNotFoundError("No timestamped raw traffic_sites CSV found.")
-
-    latest = files[0]
-    path = os.path.join(RAW_DIR, latest)
-    logger.info(f"Loading raw file: {path}")
-
-    return pd.read_csv(path)
-
-def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
-    """Standardise column names to snake_case."""
-    df.columns = (
-        df.columns
-        .str.strip()
-        .str.lower()
-        .str.replace(" ", "_")
-        .str.replace("-", "_")
-    )
-    return df
-
-def transform_sites(df: pd.DataFrame) -> pd.DataFrame:
-    """Clean and standardise the traffic sites dataset."""
-    df = clean_column_names(df)
-
-    # Select only the useful columns (adjust based on your CSV)
-    expected_cols = [
-        "site_id",
-        "site_name",
-        "region",
-        "road_name",
-        "start_km",
-        "end_km",
-        "latitude",
-        "longitude",
-        "carriageway",
-        "direction",
-        "status"
+def get_latest_raw_file():
+    """
+    Returns the most recent CSV file from the raw data directory.
+    """
+    files = [
+        f for f in os.listdir(Config.DATA_RAW_DIR)
+        if f.endswith(".csv")
     ]
 
-    df = df[[col for col in expected_cols if col in df.columns]]
+    if not files:
+        logger.error("No raw CSV files found in DATA_RAW_DIR.")
+        raise FileNotFoundError("No raw CSV files found.")
 
-    # Convert numeric fields
-    numeric_cols = ["start_km", "end_km", "latitude", "longitude"]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+    latest = max(
+        files,
+        key=lambda f: os.path.getmtime(os.path.join(Config.DATA_RAW_DIR, f))
+    )
 
-    # Add metadata
-    df["ingested_at_utc"] = utc_now().isoformat()
+    logger.info(f"Latest raw file detected: {latest}")
+    return os.path.join(Config.DATA_RAW_DIR, latest)
 
 
-    logger.info("Transformation complete.")
-    return df
+def transform_sites():
+    """
+    Loads the latest raw CSV, applies transformations,
+    and writes the processed output to the processed directory.
+    """
+    start_time = utc_now()
 
-def save_processed(df: pd.DataFrame):
-    ts = utc_now().strftime(TIMESTAMP_FORMAT)
-    path = os.path.join(PROCESSED_DIR, f"traffic_sites_processed_{ts}.csv")
-    df.to_csv(path, index=False)
-    logger.info(f"Saved processed file: {path}")
-    return path
+    try:
+        raw_file = get_latest_raw_file()
+        df = pd.read_csv(raw_file)
+
+        logger.info(f"Loaded raw file: {raw_file}")
+        metrics.info(f"raw_rows={len(df)}")
+
+        # ---------------------------------------------------------
+        # Apply your transformations here
+        # ---------------------------------------------------------
+        df["ingested_at_utc"] = utc_now().isoformat()
+
+        # Example transformation:
+        # df = df.rename(columns={"old": "new"})
+        # df["processed_flag"] = True
+
+        # ---------------------------------------------------------
+
+        ts = utc_now().strftime(Config.TIMESTAMP_FORMAT)
+        output_file = os.path.join(
+            Config.DATA_PROCESSED_DIR,
+            f"traffic_sites_processed_{ts}.csv"
+        )
+
+        df.to_csv(output_file, index=False)
+
+        logger.info(f"Processed file saved: {output_file}")
+        metrics.info(f"processed_rows={len(df)}")
+
+    except Exception as e:
+        logger.error(f"Transform failed: {e}")
+        raise
+
+    finally:
+        duration = (utc_now() - start_time).total_seconds()
+        metrics.info(f"transform_duration_sec={duration}")
+
 
 if __name__ == "__main__":
-    try:
-        raw_df = load_latest_raw()
-        processed_df = transform_sites(raw_df)
-        save_processed(processed_df)
-    except Exception as e:
-        logger.exception(f"Transform step failed: {e}")
+    transform_sites()

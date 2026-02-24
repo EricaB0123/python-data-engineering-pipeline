@@ -1,8 +1,9 @@
 import pandas as pd
 import os
 #from datetime import datetime, UTC
-from src.utils.settings import DATA_RAW_DIR, TIMESTAMP_FORMAT
+from src.utils.settings import Config
 from src.utils.time import utc_now
+
 
 from src.utils.logger import get_logger
 
@@ -19,8 +20,8 @@ def ingest_sites_csv():
 
     df = pd.read_csv(source_path)
 
-    ts = utc_now().strftime(TIMESTAMP_FORMAT)
-    dest_path = os.path.join(DATA_RAW_DIR, f"traffic_sites_{ts}.csv")
+    ts = utc_now().strftime(Config.TIMESTAMP_FORMAT)
+    dest_path = os.path.join(Config.DATA_RAW_DIR, f"traffic_sites_{ts}.csv")
 
 
     df.to_csv(dest_path, index=False)
