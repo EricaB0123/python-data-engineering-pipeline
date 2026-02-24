@@ -1,9 +1,11 @@
 import os
 import pandas as pd
 #from datetime import datetime, UTC
-from src.utils.time import utc_now
+#from src.utils.time import utc_now
 from src.utils.logger import get_logger
-from src.utils.paths import RAW_DIR, PROCESSED_DIR
+from src.utils.settings import DATA_RAW_DIR, DATA_PROCESSED_DIR, TIMESTAMP_FORMAT
+from src.utils.time import utc_now
+
 from src.utils.paths import RAW_DIR
 
 
@@ -75,7 +77,7 @@ def transform_sites(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def save_processed(df: pd.DataFrame):
-    ts = utc_now().strftime("%Y%m%d_%H%M%S")
+    ts = utc_now().strftime(TIMESTAMP_FORMAT)
     path = os.path.join(PROCESSED_DIR, f"traffic_sites_processed_{ts}.csv")
     df.to_csv(path, index=False)
     logger.info(f"Saved processed file: {path}")
