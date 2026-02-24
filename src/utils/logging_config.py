@@ -1,9 +1,9 @@
 import logging
 import os
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 from src.utils.settings import Config
 
-# Ensure the logs directory exists
+# Ensure logs directory exists
 os.makedirs(Config.LOGS_DIR, exist_ok=True)
 
 # File paths
@@ -17,29 +17,31 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 def configure_logging():
     """
     Configure global logging for the entire pipeline with:
-    - rotating main logs
-    - rotating error-only logs
+    - daily rotation at midnight
+    - separate error-only logs
     - console output
     """
 
     # -----------------------------
-    # Main rotating log handler
+    # Main daily rotating log
     # -----------------------------
-    main_handler = RotatingFileHandler(
+    main_handler = TimedRotatingFileHandler(
         MAIN_LOG_FILE,
-        maxBytes=5 * 1024 * 1024,   # 5 MB
-        backupCount=5,
+        when="midnight",      # rotate at midnight
+        interval=1,           # every 1 day
+        backupCount=7,        # keep 7 days of logs
         encoding="utf-8"
     )
     main_handler.setLevel(logging.INFO)
 
     # -----------------------------
-    # Error-only rotating log handler
+    # Error-only daily rotating log
     # -----------------------------
-    error_handler = RotatingFileHandler(
+    error_handler = TimedRotatingFileHandler(
         ERROR_LOG_FILE,
-        maxBytes=5 * 1024 * 1024,
-        backupCount=5,
+        when="midnight",
+        interval=1,
+        backupCount=14,       # keep 14 days of error logs
         encoding="utf-8"
     )
     error_handler.setLevel(logging.ERROR)
