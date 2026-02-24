@@ -1,18 +1,13 @@
 import logging
-import os
-from src.utils.paths import LOG_DIR
+from src.utils.logging_config import configure_logging
 
-#LOG_DIR = "logs"
-os.makedirs(LOG_DIR, exist_ok=True)
+# Configure logging once when this module is imported
+configure_logging()
 
-def get_logger(name: str):
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+def get_logger(name: str) -> logging.Logger:
+    """
+    Returns a logger instance with the given name.
+    Logging configuration is handled globally in logging_config.py.
+    """
+    return logging.getLogger(name)
 
-    if not logger.handlers:
-        file_handler = logging.FileHandler(os.path.join(LOG_DIR, f"{name}.log"))
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-    return logger
