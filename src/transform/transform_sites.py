@@ -3,12 +3,14 @@ import pandas as pd
 #from datetime import datetime, UTC
 from src.utils.time import utc_now
 from src.utils.logger import get_logger
+from src.utils.paths import RAW_DIR, PROCESSED_DIR
+from src.utils.paths import RAW_DIR
 
 
 logger = get_logger("transform")
 
-RAW_DIR = "data/raw"
-PROCESSED_DIR = "data/processed"
+#RAW_DIR = "data/raw"  #replaced with paths.py files
+#PROCESSED_DIR = "data/processed"
 os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 def load_latest_raw():
