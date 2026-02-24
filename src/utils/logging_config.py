@@ -1,20 +1,25 @@
 import logging
 import os
-from src.utils.settings import LOGS_DIR
+from src.utils.settings import Config
 
-# Ensure logs directory exists
-os.makedirs(LOGS_DIR, exist_ok=True)
+# Ensure the logs directory exists
+os.makedirs(Config.LOGS_DIR, exist_ok=True)
 
-LOG_FILE = os.path.join(LOGS_DIR, "pipeline.log")
+LOG_FILE = os.path.join(Config.LOGS_DIR, "pipeline.log")
 
 LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
+
 def configure_logging():
+    """
+    Configure global logging for the entire pipeline.
+    This function is called once when logger.py imports it.
+    """
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG if Config.DEBUG else logging.INFO,
         format=LOG_FORMAT,
         handlers=[
             logging.FileHandler(LOG_FILE),
-            logging.StreamHandler()  # optional: prints to console
+            logging.StreamHandler()  # console output
         ]
     )
