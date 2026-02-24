@@ -1,6 +1,7 @@
 import os
 import pandas as pd
-from datetime import datetime, UTC
+#from datetime import datetime, UTC
+from src.utils.time import utc_now
 from src.utils.logger import get_logger
 
 
@@ -65,14 +66,14 @@ def transform_sites(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
     # Add metadata
-    df["ingested_at_utc"] = datetime.now(UTC).isoformat()
+    df["ingested_at_utc"] = utc_now().isoformat()
 
 
     logger.info("Transformation complete.")
     return df
 
 def save_processed(df: pd.DataFrame):
-    ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+    ts = utc_now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(PROCESSED_DIR, f"traffic_sites_processed_{ts}.csv")
     df.to_csv(path, index=False)
     logger.info(f"Saved processed file: {path}")
