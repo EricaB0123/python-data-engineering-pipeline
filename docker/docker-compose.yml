@@ -6,6 +6,11 @@ services:
     container_name: sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourStrong!Passw0rd
+      - SA_PASSWORD="/run/secrets/sql_password"
+    secrets:
+      - sql_password
     ports:
       - "1433:1433"
+secrets:
+  sql_password:
+  file: ./secrets/sql_password.txt
