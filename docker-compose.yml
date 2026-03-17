@@ -28,7 +28,6 @@ services:
       - sql_password
     volumes:
       - .:/app
-
 secrets:
   sql_password:
     file: ./secrets/sql_password.txt
