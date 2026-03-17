@@ -1,3 +1,5 @@
+#Erica: This is where the DataFrame gets written into the SQL server
+
 from src.utils.settings import Config
 import pandas as pd
 from src.utils.db import get_engine
