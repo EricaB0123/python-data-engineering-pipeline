@@ -6,6 +6,8 @@ class Config:
     SQL_PORT = int(os.getenv("SQL_SERVER_PORT", 1433))
     SQL_USER = os.getenv("SQL_SERVER_USER", "sa")
     SQL_DB = os.getenv("SQL_SERVER_DB", "TrafficDB")
+    LOGS_DIR = "logs"
+
 
 _password_file = os.getenv("SQL_SERVER_PASSWORD_FILE")
 
