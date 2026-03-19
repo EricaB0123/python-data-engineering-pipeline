@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 
 class Config:
+    DEBUG = False
     SQL_HOST = os.getenv("SQL_SERVER_HOST", "localhost")
     SQL_PORT = int(os.getenv("SQL_SERVER_PORT", 1433))
     SQL_USER = os.getenv("SQL_SERVER_USER", "sa")
